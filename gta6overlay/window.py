@@ -13,7 +13,7 @@ from .widgets import (Card, ComboRow, GroupSection, SliderRow, ToggleRow, QSS, m
 STATES = {
     "ok": ("Tracking", "#3ddc97"),
     "search": ("Searching for map", "#f2b544"),
-    "nosignal": ("No camera signal", "#ff6b6b"),
+    "nosignal": ("No video signal", "#ff6b6b"),
     "loading": ("Loading", "#8b93a3"),
     "setup": ("Setup needed", "#8b93a3"),
 }
@@ -352,10 +352,11 @@ class MainWindow(QtWidgets.QWidget):
         cfg = self.cfg
         host, col = column()
 
-        capture = Card("Capture")
+        capture = Card("Video source")
         self.scan_btn = button("Scan", None, self.ctl.scan_cameras)
-        self.camera_row = ComboRow("Camera", [(f"Camera {cfg.camera}", cfg.camera)], self.scan_btn,
-                                   "Pick the OBS Virtual Camera. Start it in OBS first, then press Scan.")
+        self.camera_row = ComboRow("Video device", [(f"Device {cfg.camera}", cfg.camera)], self.scan_btn,
+                                   "Choose the device that shows your game: a capture card (like an Elgato) or a "
+                                   "virtual camera. The overlay reads the picture from it, not from your screen.")
         self.camera_row.set_current(cfg.camera)
         self.camera_row.picked.connect(self._pick_camera)
         self.camera_note = muted("")
@@ -444,7 +445,7 @@ class MainWindow(QtWidgets.QWidget):
     def _pick_camera(self, index):
         self.camera_note.hide()
         if not self.ctl.set_camera(index):
-            self.camera_note.setText(f"Could not open camera {index}. Is the virtual camera running?")
+            self.camera_note.setText(f"Could not open device {index}. Make sure it is connected and not in use by another program.")
             self.camera_note.show()
             self.camera_row.set_current(self.cfg.camera)
 
@@ -453,7 +454,7 @@ class MainWindow(QtWidgets.QWidget):
         self.scan_btn.setText("Scan")
         items = [(label, index) for index, label in cameras]
         if not items:
-            self.camera_note.setText("No cameras found. Start the OBS Virtual Camera and scan again.")
+            self.camera_note.setText("No video devices found. Connect your capture card (or start a virtual camera) and scan again.")
             self.camera_note.show()
             return
         self.camera_note.hide()
@@ -547,10 +548,13 @@ class MainWindow(QtWidgets.QWidget):
         col.addWidget(about)
 
         guide = Card("Quick start")
-        for line in ("1.  In OBS, start the Virtual Camera and show your game capture.",
-                     "2.  Open the in-game map and keep it visible.",
-                     "3.  Pick the OBS Virtual Camera under Settings > Camera.",
-                     "4.  Left-click a marker for info, right-click to mark it found."):
+        for line in ("1.  Your game's picture must reach this PC through a video device, such as a capture "
+                     "card (Elgato and similar) or the OBS Virtual Camera.",
+                     "2.  Open the in-game map and keep it on screen.",
+                     "3.  Under Settings > Video source, pick that device (press Scan to refresh the list).",
+                     "4.  When the map is found, the status at the top turns green and says Tracking.",
+                     "5.  Left-click a marker for info, right-click to mark it found. You can change these buttons "
+                     "in Settings."):
             guide.add(muted(line))
         col.addWidget(guide)
         col.addStretch(1)

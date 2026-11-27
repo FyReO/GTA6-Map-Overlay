@@ -242,7 +242,7 @@ class Controller(QtCore.QObject):
             self.overlay.engine = engine
         self.window.attach_engine(engine)
         if engine.camera_error:
-            self.window.camera_note.setText(engine.camera_error + ". Pick the camera under Settings.")
+            self.window.camera_note.setText(engine.camera_error + ". Pick the video source under Settings.")
             self.window.camera_note.show()
         self.settings_changed()
 

@@ -4,11 +4,11 @@ APP_NAME = "GTA 6 Map Overlay"
 APP_DIR_NAME = "GTA6MapOverlay"
 EXE_NAME = "GTA6MapOverlay.exe"
 DATA_ASSET = "data-pack.zip"
-GITHUB_REPO = "FyReO/GTA6-Map-Overlay"   # your "owner/repo" on GitHub; updates are read from its releases
+GITHUB_REPO = "FyReO/GTA6-Map-Overlay"
 YOUTUBE_URL = "https://www.youtube.com/@fyreo"
-DONATE_URL = "https://www.paypal.com/paypalme/fyreoyt"          # your donate page; the Donate button stays hidden while this is empty
+DONATE_URL = "https://www.paypal.com/paypalme/fyreoyt"
 API_BASE = "https://api.github.com"
-ALLOWED_HOSTS = ("github.com", "githubusercontent.com")   # downloads are only accepted from these hosts
+ALLOWED_HOSTS = ("github.com", "githubusercontent.com")
 
 PROC_WIDTH = 1280        # width used by the slow background matcher
 REF_TILE = 2400          # reference images are scanned at FULL resolution in tiles this big
@@ -45,3 +45,11 @@ SHAPE_POINTS = {   # unit outlines, scaled by the marker size
 # and no markers are drawn there.
 HUD_ZONES = [(0, 0, 1, 0.09), (0, 0.09, 0.055, 0.6),
              (0.88, 0.09, 1, 0.2), (0.85, 0.72, 1, 1)]
+
+# Fixed on-screen items (centre cursor, controller icon). Ignored for matching only;
+# markers are still drawn there.
+STATIC_ZONES = [(0.47, 0.44, 0.53, 0.56), (0.052, 0.16, 0.08, 0.21)]
+
+# A position correction that jumps further than FIX_SNAP and has fewer inliers than
+# STRONG_FIX must be confirmed by a second, agreeing correction before it is applied.
+STRONG_FIX = 45

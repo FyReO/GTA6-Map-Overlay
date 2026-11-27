@@ -1,14 +1,14 @@
 # GTA 6 Map Overlay
 
-Draws every collectible from MapGenie (cards, Waink locations, exploration, activities, stunts) on top of your in-game map. It reads your game through the OBS Virtual Camera, works out where the map is, and places the markers. Click a marker for its description and screenshots, right-click to mark it found.
+Draws every collectible from MapGenie (cards, Waink locations, exploration, activities, stunts) on top of your in-game map. It reads your game's picture from a video device (a capture card such as an Elgato, or the OBS Virtual Camera), works out where the map is, and places the markers. It does not read your screen, and OBS is not required. Click a marker for its description and screenshots, right-click to mark it found.
 
 ## For players
 
 1. Download `GTA6MapOverlay.exe` from the [Releases](../../releases) page and run it.
    Windows SmartScreen may warn about an unknown publisher the first time: choose **More info > Run anyway**.
 2. On first launch it downloads the map data once (reference maps, locations, screenshots). Updates after that are automatic.
-3. In OBS, start the **Virtual Camera** with your game capture on it, then open the in-game map.
-4. Open the **Settings** tab and pick the OBS Virtual Camera (press **Scan** if it isn't listed).
+3. Open the in-game map and keep it on screen.
+4. Open the **Settings** tab and pick your video device under **Video source** (press **Scan** if it isn't listed). This is the device that carries your game's picture, for example your Elgato capture card. When the map is found, the status at the top turns green.
 
 | Hotkey | Action |
 | --- | --- |

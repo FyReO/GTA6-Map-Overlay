@@ -29,14 +29,14 @@ def scan_cameras(skip=None, limit=6):
     found = []
     for index in range(limit):
         if index == skip:
-            found.append((index, f"Camera {index} (in use)"))
+            found.append((index, f"Device {index} (in use)"))
             continue
         cap = open_capture(index)
         if cap is None:
             continue
         ok, frame = cap.read()
         cap.release()
-        label = f"Camera {index}"
+        label = f"Device {index}"
         if ok and frame is not None:
             label += f" ({frame.shape[1]}x{frame.shape[0]})"
         found.append((index, label))
@@ -81,7 +81,7 @@ class Engine:
     def open_camera(self, index):
         cap = open_capture(index)
         if cap is None:
-            self.camera_error = f"Could not open camera {index}"
+            self.camera_error = f"Could not open video device {index}"
             return False
         with self._cap_lock:
             old, self._cap = self._cap, cap
@@ -160,7 +160,7 @@ class Engine:
             if last is not None:
                 H, lv, _, sz = last
                 D = np.diag([C.FAST_WIDTH / sz[0], C.FAST_WIDTH / sz[0], 1.0])
-                self.fast.apply_fix(rfid, D @ H, lv, time.time(), self.size, self.cfg.fix_blend)
+                self.fast.apply_fix(rfid, D @ H, lv, time.time(), self.size, self.cfg.fix_blend, n)
         self.fast_ms = (time.time() - t0) * 1000
         return self._points()
 

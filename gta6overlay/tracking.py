@@ -13,7 +13,7 @@ from .features import fit_transform, load_features, merc
 def _hud_mask(shape):
     mask = np.full(shape, 255, np.uint8)
     height, width = shape
-    for x0, y0, x1, y1 in C.HUD_ZONES:
+    for x0, y0, x1, y1 in C.HUD_ZONES + C.STATIC_ZONES:
         mask[int(y0 * height):int(y1 * height), int(x0 * width):int(x1 * width)] = 0
     return mask
 
@@ -255,6 +255,7 @@ class FastLayer:
         self.B = None
         self.lv = None
         self.anchor_time = 0.0
+        self.pending = None
         self.epoch = 0
         self._break()
 
@@ -264,6 +265,7 @@ class FastLayer:
         self.hist.clear()
         self.B = None
         self.lv = None
+        self.pending = None
 
     def step(self, fid, gray):
         if self.prev is not None:
@@ -290,22 +292,42 @@ class FastLayer:
             gray, maxCorners=300, qualityLevel=0.01, minDistance=8, mask=self.mask)
         self.prev = gray
 
-    def apply_fix(self, fid, H, lv, now, size=None, blend=0.5):
+    def apply_fix(self, fid, H, lv, now, size=None, blend=0.5, n=999):
         h = self.hist.get(fid)
         if h is None or h[1] != self.epoch:
             return False
         B_new = np.linalg.inv(h[0]) @ H
-        if (size is not None and self.B is not None and self.lv is lv
-                and now - self.anchor_time <= C.ANCHOR_TIMEOUT):
-            c = np.array([size[0] / 2, size[1] / 2, 1.0])
+        c = np.array([size[0] / 2, size[1] / 2, 1.0]) if size is not None else None
+        live = self.B is not None and now - self.anchor_time <= C.ANCHOR_TIMEOUT
+        if live and c is not None:
             o = h[0] @ self.B @ (np.linalg.inv(H) @ c)
             o = o[:2] / o[2]
-            if np.hypot(o[0] - c[0], o[1] - c[1]) < C.FIX_SNAP * size[0]:
+            near = np.hypot(o[0] - c[0], o[1] - c[1]) < C.FIX_SNAP * size[0]
+            if near and self.lv is lv:
                 B_new = (1 - blend) * self.B + blend * B_new
+                self.pending = None
+            elif n < C.STRONG_FIX:
+                if self._confirms(B_new, lv, c, now):
+                    self.pending = None
+                else:
+                    self.pending = (B_new, lv, now)
+                    return True
+            else:
+                self.pending = None
         self.B = B_new
         self.lv = lv
         self.anchor_time = now
         return True
+
+    def _confirms(self, B_new, lv, c, now):
+        if self.pending is None:
+            return False
+        Bp, lp, tp = self.pending
+        if lp is not lv or now - tp > 1.5:
+            return False
+        o = B_new @ (np.linalg.inv(Bp) @ c)
+        o = o[:2] / o[2]
+        return np.hypot(o[0] - c[0], o[1] - c[1]) < C.FIX_SNAP * 2 * c[0]
 
     def current(self, now):
         if self.B is None or now - self.anchor_time > C.ANCHOR_TIMEOUT:

@@ -56,6 +56,16 @@ QMessageBox, QFileDialog, QColorDialog { background: #14161b; }
 """
 
 
+class NoWheelComboBox(QtWidgets.QComboBox):
+    def wheelEvent(self, event):
+        event.ignore()
+
+
+class NoWheelSlider(QtWidgets.QSlider):
+    def wheelEvent(self, event):
+        event.ignore()
+
+
 def muted(text, wrap=True):
     label = QtWidgets.QLabel(text)
     label.setObjectName("muted")
@@ -171,7 +181,7 @@ class SliderRow(QtWidgets.QWidget):
         top.addStretch(1)
         top.addWidget(self.value)
         lay.addLayout(top)
-        self.slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
+        self.slider = NoWheelSlider(QtCore.Qt.Horizontal)
         self.slider.setRange(lo, hi)
         self.slider.setValue(value)
         self.slider.valueChanged.connect(self._moved)
@@ -206,7 +216,7 @@ class ComboRow(QtWidgets.QWidget):
         lay.addWidget(QtWidgets.QLabel(title))
         row = QtWidgets.QHBoxLayout()
         row.setSpacing(8)
-        self.combo = QtWidgets.QComboBox()
+        self.combo = NoWheelComboBox()
         self.combo.setSizeAdjustPolicy(QtWidgets.QComboBox.AdjustToMinimumContentsLengthWithIcon)
         self.combo.setMinimumContentsLength(12)
         row.addWidget(self.combo, 1)
