@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+build/
+dist/
+dist-data/
+.venv/
+*.log
+ref_z*.png
+ref_z*.json
+cache*.npz
+card_media/
+cards_info.json
+extras.json
+found*.json
+overlay_settings.json
